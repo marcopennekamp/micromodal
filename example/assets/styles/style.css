@@ -9,6 +9,10 @@
   Page Styles
 \**************************/
 
+body.micromodal-open {
+  overflow: hidden;
+}
+
 button { cursor: pointer; }
 
 .underline {

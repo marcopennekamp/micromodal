@@ -33,6 +33,9 @@ const MicroModal = (() => {
       // Save a reference of the modal
       this.modal = document.getElementById(targetModal)
 
+      // Save a reference to the body
+      this.body = document.querySelector('body')
+
       // Save a reference to the passed config
       this.config = { debugMode, disableScroll, openTrigger, closeTrigger, onShow, onClose, awaitCloseAnimation, disableFocus }
 
@@ -59,6 +62,7 @@ const MicroModal = (() => {
       this.activeElement = document.activeElement
       this.modal.setAttribute('aria-hidden', 'false')
       this.modal.classList.add('is-open')
+      this.body.classList.add('micromodal-open')
       this.setFocusToFirstNode()
       this.scrollBehaviour('disable')
       this.addEventListeners()
@@ -67,19 +71,25 @@ const MicroModal = (() => {
 
     closeModal () {
       const modal = this.modal
+      const body = this.body
       this.modal.setAttribute('aria-hidden', 'true')
       this.removeEventListeners()
       this.scrollBehaviour('enable')
       this.activeElement.focus()
       this.config.onClose(this.modal)
 
+      const removeClasses = () => {
+        modal.classList.remove('is-open')
+        body.classList.remove('micromodal-open')
+      }
+
       if (this.config.awaitCloseAnimation) {
         this.modal.addEventListener('animationend', function handler () {
-          modal.classList.remove('is-open')
+          removeClasses()
           modal.removeEventListener('animationend', handler, false)
         }, false)
       } else {
-        modal.classList.remove('is-open')
+        removeClasses()
       }
     }
 

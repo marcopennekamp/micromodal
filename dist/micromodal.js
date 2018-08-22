@@ -4,7 +4,7 @@
 	(global.MicroModal = factory());
 }(this, (function () { 'use strict';
 
-var version = "0.3.1";
+var version = "0.3.2";
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -70,6 +70,9 @@ var MicroModal = function () {
       // Save a reference of the modal
       this.modal = document.getElementById(targetModal);
 
+      // Save a reference to the body
+      this.body = document.querySelector('body');
+
       // Save a reference to the passed config
       this.config = { debugMode: debugMode, disableScroll: disableScroll, openTrigger: openTrigger, closeTrigger: closeTrigger, onShow: onShow, onClose: onClose, awaitCloseAnimation: awaitCloseAnimation, disableFocus: disableFocus
 
@@ -109,6 +112,7 @@ var MicroModal = function () {
         this.activeElement = document.activeElement;
         this.modal.setAttribute('aria-hidden', 'false');
         this.modal.classList.add('is-open');
+        this.body.classList.add('micromodal-open');
         this.setFocusToFirstNode();
         this.scrollBehaviour('disable');
         this.addEventListeners();
@@ -118,19 +122,25 @@ var MicroModal = function () {
       key: 'closeModal',
       value: function closeModal() {
         var modal = this.modal;
+        var body = this.body;
         this.modal.setAttribute('aria-hidden', 'true');
         this.removeEventListeners();
         this.scrollBehaviour('enable');
         this.activeElement.focus();
         this.config.onClose(this.modal);
 
+        var removeClasses = function removeClasses() {
+          modal.classList.remove('is-open');
+          body.classList.remove('micromodal-open');
+        };
+
         if (this.config.awaitCloseAnimation) {
           this.modal.addEventListener('animationend', function handler() {
-            modal.classList.remove('is-open');
+            removeClasses();
             modal.removeEventListener('animationend', handler, false);
           }, false);
         } else {
-          modal.classList.remove('is-open');
+          removeClasses();
         }
       }
     }, {
