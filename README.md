@@ -41,6 +41,7 @@ The aim of this library is to make modal dialogs accessible and easy to include 
 ✔ Traps tab focus within the modal   
 ✔ Focuses on the first focusable element within the modal   
 ✔ Retains the focused element state after closing the modal   
+✔ Adds a `micromodal-open` class to the body element when a modal is opened.
 
 &nbsp;
 
