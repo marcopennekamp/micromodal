@@ -4,7 +4,7 @@
 	(global.MicroModal = factory());
 }(this, (function () { 'use strict';
 
-var version = "0.3.3";
+var version = "0.3.4";
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -109,6 +109,7 @@ var MicroModal = function () {
     }, {
       key: 'showModal',
       value: function showModal() {
+        activeModals[this.modal.id] = this;
         this.activeElement = document.activeElement;
         this.modal.setAttribute('aria-hidden', 'false');
         this.modal.classList.add('is-open');
@@ -121,6 +122,7 @@ var MicroModal = function () {
     }, {
       key: 'closeModal',
       value: function closeModal() {
+        delete activeModals[this.modal.id];
         var modal = this.modal;
         var body = this.body;
         this.modal.setAttribute('aria-hidden', 'true');
@@ -228,19 +230,16 @@ var MicroModal = function () {
   }();
 
   /**
-   * Modal prototype ends.
-   * Here on code is reposible for detecting and
-   * autobinding event handlers on modal triggers
+   * The following code is responsible for detecting and autobinding event handlers on modal triggers.
    */
 
-  // Keep a reference to the opened modal
+  // Keep a reference to opened modals
 
 
-  var activeModal = null;
+  var activeModals = {};
 
   /**
-   * Generates an associative array of modals and it's
-   * respective triggers
+   * Generates an associative array of modals and their respective triggers.
    * @param  {array} triggers     An array of all triggers
    * @param  {string} triggerAttr The data-attribute which triggers the module
    * @return {array}
@@ -258,8 +257,7 @@ var MicroModal = function () {
   };
 
   /**
-   * Validates whether a modal of the given id exists
-   * in the DOM
+   * Validates whether a modal of the given id exists in the DOM.
    * @param  {number} id  The id of the modal
    * @return {boolean}
    */
@@ -272,8 +270,7 @@ var MicroModal = function () {
   };
 
   /**
-   * Validates if there are modal triggers present
-   * in the DOM
+   * Validates if there are modal triggers present in the DOM.
    * @param  {array} triggers An array of data-triggers
    * @return {boolean}
    */
@@ -286,8 +283,7 @@ var MicroModal = function () {
   };
 
   /**
-   * Checks if triggers and their corresponding modals
-   * are present in the DOM
+   * Checks if triggers and their corresponding modals are present in the DOM.
    * @param  {array} triggers   Array of DOM nodes which have data-triggers
    * @param  {array} triggerMap Associative array of modals and thier triggers
    * @return {boolean}
@@ -334,6 +330,11 @@ var MicroModal = function () {
    * @return {void}
    */
   var show = function show(targetModal, config) {
+    // Don't show the modal if it's active already.
+    if (activeModals[targetModal]) {
+      return;
+    }
+
     var options = config || {};
     options.targetModal = targetModal;
 
@@ -341,16 +342,21 @@ var MicroModal = function () {
     if (options.debugMode === true && validateModalPresence(targetModal) === false) return;
 
     // stores reference to active modal
-    activeModal = new Modal(options); // eslint-disable-line no-new
-    activeModal.showModal();
+    var modal = new Modal(options); // eslint-disable-line no-new
+    modal.showModal();
   };
 
   /**
    * Closes the active modal
+   * @param  {string} targetModal [The id of the modal to close]
    * @return {void}
    */
-  var close = function close() {
-    activeModal.closeModal();
+  var close = function close(targetModal) {
+    if (!activeModals[targetModal]) {
+      console.warn('The modal you want to close (ID: ' + targetModal + ') is not opened.');
+      return;
+    }
+    activeModals[targetModal].closeModal();
   };
 
   return { init: init, show: show, close: close };
