@@ -1,4 +1,6 @@
 ## Release History
+* **0.3.3**
+    * `FEATURE` A `micromodal-open` class is now added to the body element whenever a modal is open
 * **0.3.2**
     * `BUGFIX` Fixed bundling for es and umd builds
 * **0.3.1**
